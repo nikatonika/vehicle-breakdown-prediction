@@ -33,11 +33,27 @@
 │   ├── car_train_merged.csv
 │   ├── links_with_models.csv
 │   ├── mean_salary_by_city_sorted.csv
-│   └── submission.csv
 ├── models
 │   └── weighted_soft_top3.pkl
 ├── Competitive_DS_Zaslavskaia_V_All_Tasks_v2.ipynb
 └── README.md
+├── submissions
+│   └── submission_weighted_soft_311.csv 
+│ └── xgb_tuned.pkl 
+├── submissions 
+│ ├── submission.csv
+│ ├── submission_hard_voting.csv 
+│ ├── submission_soft_optuna.csv │
+ ├── submission_xgb_tuned.csv 
+ │ ├── submission (7).csv │
+  └── submission (8).csv 
+├── models 
+├── best_weights.json
+├── catboost_tuned.pkl 
+├── label_encoder_blend.pkl 
+
+├── lgb_model_tuned.pkl
+├── rf_tuned.pkl ├── Competitive_DS_Zaslavskaia_V_All_Tasks_v2.ipynb ├── README.md
 
 ## 🔢 Этапы проекта
 
