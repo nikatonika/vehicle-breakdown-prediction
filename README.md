@@ -36,55 +36,52 @@
 │   └── submission.csv
 ├── models
 │   └── weighted_soft_top3.pkl
-├── Competitive_DS_Zaslavskaia_V_All_Tasks.ipynb
+├── Competitive_DS_Zaslavskaia_V_All_Tasks_v2.ipynb
 └── README.md
 
-## 🔢 Этапы проекта 
+## 🔢 Этапы проекта
 
 ### ✅ ДЗ 1: Генерация и фильтрация признаков
-- Сгенерированы 20+ новых признаков из `rides_info`, `driver_info`, `fix_info`
-- Реализованы методы фильтрации признаков:
-  - проверка на константы
-  - корреляция Phik
-  - Permutation Importance (Random Forest)
-  - SHAP
-  - Feature Importance (CatBoost)
-- Отобраны 12 ключевых признаков (категориальные + числовые)
+- Созданы новые признаки из `rides_info`, `driver_info`, `fix_info`.
+- Отбор признаков с помощью:
+  - константности,
+  - корреляции Phik,
+  - Permutation Importance (Random Forest),
+  - SHAP.
+- Выбрано 12 финальных признаков.
 
-### ✅ ДЗ 2: Обучение модели классификации
-- Использован `CatBoostClassifier`
-- Проведено разделение на train/valid
-- Оценка качества: `accuracy ≈ 0.974`
-- Построены графики важности признаков, confusion matrix, SHAP waterfall plot
+### ✅ ДЗ 2: Обучение базовой модели
+- Обучение `CatBoostClassifier` на отобранных признаках.
+- Accuracy ≈ 0.974 на валидационной выборке.
 
 ### ✅ ДЗ 3: Тюнинг гиперпараметров
-- Использована `Optuna`
-- Оптимизированы `iterations`, `depth`, `learning_rate`, `l2_leaf_reg`
-- Улучшение метрики: `+0.0021` (accuracy ≈ 0.9765)
-- Добавлен контроль переобучения через `eval_set` и `early_stopping_rounds`
+- Подбор через `Optuna`.
+- Улучшение accuracy до ≈ 0.9765.
+- Использование `early_stopping_rounds` для контроля переобучения.
 
 ### ✅ ДЗ 4: Блендинг моделей
-- Обучены и оттюнингованы 4 модели:
+- Обучение и тюнинг моделей:
   - `CatBoostClassifier`
-  - `LGBMClassifier` (goss)
-  - `XGBClassifier` (dart)
+  - `LGBMClassifier (goss)`
+  - `XGBClassifier (dart)`
   - `RandomForestClassifier`
 - Реализованы:
-  - Hard Voting (без CatBoost — он мешал ансамблю)
-  - Soft Voting (с CatBoost и без него)
-- Лучший результат дал `XGBoost` отдельно: **accuracy = 0.9786**
-- Ансамбль из `XGB + LGBM + RF` дал **accuracy = 0.9765**
+  - Hard Voting (реализация вручную без VotingClassifier)
+  - Soft Voting (с оптимизацией весов через Optuna)
+- Лучшее качество после оптимизированного Soft Voting: **accuracy = 0.9808**.
 
-### ✅ ДЗ 5: Дополнительные эксперименты
-- Weighted Soft Voting (с приоритетом XGB)
-- StackingClassifier
+### ✅ ДЗ 5: Сабмит на Kaggle
+- Предобработка тестовой выборки.
+- Применение обученных моделей для предсказания.
+- Сабмит результата на Kaggle.
+- Лучшая публичная метрика: **0.96549**.
 
 ## 🔺 Финальные выводы
 
-- Наилучший результат показал `XGBoost` с индивидуальным обучением
-- Признаки, важные по всем метрикам: `max_speed`, `avg_destroy_degree`, `speed_avg_mean`, `driver_accident_mean`, `mean_rating`
-- Категориальные признаки полезны, но только в комбинации
-- Блендинг эффективен, если модели действительно комплементарны
+- Наилучший результат показал Soft Voting с оптимизированными весами моделей.
+- `LightGBM`, несмотря на простую архитектуру, внёс наибольший вклад в финальную метрику.
+- Правильная обработка категориальных признаков и баланс моделей оказались критичны.
+- Блендинг моделей значительно повысил устойчивость финального решения.
 
 ## 🏋️ Используемые библиотеки
 
