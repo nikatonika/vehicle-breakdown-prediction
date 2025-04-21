@@ -12,48 +12,41 @@
 
 Цель: **создание приоритетного списка машин для осмотра технической бригадой**.
 
-
 ## 📂 Данные
 
 Используются 4 источника данных:
 
-1. `car_train.csv` — основная таблица с машинами и таргетами
-2. `rides_info.csv` — информация о поездках
-3. `driver_info.csv` — данные о водителях
-4. `fix_info.csv` — история ремонтов
+1. `car_train.csv` — основная таблица с машинами и таргетами.
+2. `rides_info.csv` — информация о поездках.
+3. `driver_info.csv` — данные о водителях.
+4. `fix_info.csv` — история ремонтов.
+
+Дополнительно созданы обогащённые версии тренировочного и тестового датасетов.
 
 ## Структура репозитория
+
+```
 .
-├── data
-│   ├── car_ids_test.csv
-│   ├── car_test_final.csv
-│   ├── car_train_enriched.csv
-│   ├── car_train_filtered.csv
-│   ├── car_train_full.csv
+├── data/
+│   ├── parsed_car_dataset.csv
 │   ├── car_train_merged.csv
+│   ├── car_test_final.csv
 │   ├── links_with_models.csv
 │   ├── mean_salary_by_city_sorted.csv
-├── models
-│   └── weighted_soft_top3.pkl
-├── Competitive_DS_Zaslavskaia_V_All_Tasks_v2.ipynb
-└── README.md
-├── submissions
-│   └── submission_weighted_soft_311.csv 
-│ └── xgb_tuned.pkl 
-├── submissions 
-│ ├── submission.csv
-│ ├── submission_hard_voting.csv 
-│ ├── submission_soft_optuna.csv │
- ├── submission_xgb_tuned.csv 
- │ ├── submission (7).csv │
-  └── submission (8).csv 
-├── models 
+├── models/
+│   ├── catboost_tuned.pkl
+│   ├── lgb_tuned.pkl
+│   ├── xgb_tuned.pkl
+│   ├── rf_tuned.pkl
+│   └── label_encoder_blend.pkl
+├── submissions/
+│   ├── submission_soft_optuna.csv
+│   ├── submission_soft_ext_optuna.csv
+│   └── другие версии сабмитов
 ├── best_weights.json
-├── catboost_tuned.pkl 
-├── label_encoder_blend.pkl 
-
-├── lgb_model_tuned.pkl
-├── rf_tuned.pkl ├── Competitive_DS_Zaslavskaia_V_All_Tasks_v2.ipynb ├── README.md
+├── Competitive_DS_Zaslavskaia_V_All_Tasks_v2.ipynb
+├── README.md
+```
 
 ## 🔢 Этапы проекта
 
@@ -64,40 +57,66 @@
   - корреляции Phik,
   - Permutation Importance (Random Forest),
   - SHAP.
-- Выбрано 12 финальных признаков.
+- Выбрано 12 основных признаков.
 
 ### ✅ ДЗ 2: Обучение базовой модели
-- Обучение `CatBoostClassifier` на отобранных признаках.
+- Обучение `CatBoostClassifier` на базовых признаках.
 - Accuracy ≈ 0.974 на валидационной выборке.
 
 ### ✅ ДЗ 3: Тюнинг гиперпараметров
 - Подбор через `Optuna`.
-- Улучшение accuracy до ≈ 0.9765.
-- Использование `early_stopping_rounds` для контроля переобучения.
+- Улучшение качества CatBoost до ≈ 0.9765.
+- Использование `early_stopping_rounds`.
 
 ### ✅ ДЗ 4: Блендинг моделей
 - Обучение и тюнинг моделей:
   - `CatBoostClassifier`
-  - `LGBMClassifier (goss)`
-  - `XGBClassifier (dart)`
+  - `LGBMClassifier` (goss boosting)
+  - `XGBClassifier` (dart boosting)
   - `RandomForestClassifier`
 - Реализованы:
-  - Hard Voting (реализация вручную без VotingClassifier)
-  - Soft Voting (с оптимизацией весов через Optuna)
-- Лучшее качество после оптимизированного Soft Voting: **accuracy = 0.9808**.
+  - Hard Voting (ручная реализация),
+  - Soft Voting с оптимизацией весов через `Optuna`.
+- Лучшее качество после Soft Voting: **Accuracy = 0.9808**.
 
 ### ✅ ДЗ 5: Сабмит на Kaggle
 - Предобработка тестовой выборки.
-- Применение обученных моделей для предсказания.
 - Сабмит результата на Kaggle.
-- Лучшая публичная метрика: **0.96549**.
+- Лучший результат на базовом датасете: **0.96549**.
 
-## 🔺 Финальные выводы
+---
 
-- Наилучший результат показал Soft Voting с оптимизированными весами моделей.
-- `LightGBM`, несмотря на простую архитектуру, внёс наибольший вклад в финальную метрику.
-- Правильная обработка категориальных признаков и баланс моделей оказались критичны.
-- Блендинг моделей значительно повысил устойчивость финального решения.
+## 🔥 Работа с расширенным датасетом
+
+Дополнительно проведено обучение моделей на **обогащённом датасете**, включающем новые признаки:
+
+- `box`
+- `year`
+- `price`
+- `power`
+
+Результаты:
+
+| Модель               | Accuracy базовый | Accuracy расширенный |
+|----------------------|------------------|----------------------|
+| CatBoost             | 0.9765            | 0.9808               |
+| LightGBM             | 0.9786            | 0.9786               |
+| XGBoost              | 0.9765            | 0.9765               |
+| RandomForest         | 0.9765            | 0.9765               |
+| Soft Voting (Optuna) | 0.9808            | 0.9808               |
+
+| Сабмишен                                 | Accuracy на Kaggle |
+|:------------------------------------------|:------------------:|
+| submission_soft_optuna.csv (базовый)      | 0.96549             |
+| submission_soft_ext_optuna.csv (расширенный) | 0.96497           |
+
+### Выводы:
+
+- Локально на валидации качество моделей осталось высоким или даже улучшилось (для CatBoost).
+- Однако на тестовой выборке Kaggle итоговое качество слегка снизилось (~0.0005).
+- Причина в слабой информативности добавленных признаков и различиях между обучающим и тестовым распределением данных.
+
+---
 
 ## 🏋️ Используемые библиотеки
 
@@ -115,23 +134,21 @@ xgboost
 scikit-learn
 ```
 
-## 📁 Описание файлов в `data/`
+## 📁 Описание ключевых файлов
 
 | Файл | Описание |
 |------|----------|
-| `car_ids_test.csv` | Список ID машин из тестовой выборки, используется для формирования финального сабмита |
-| `car_test_final.csv` | Финальная тестовая выборка с нужными признаками, готовая к инференсу моделей |
-| `car_train_enriched.csv` | Обогащённая тренировочная выборка, объединённая с внешними источниками (например, по зарплатам или другим характеристикам) |
-| `car_train_filtered.csv` | Отфильтрованная версия тренировочной выборки после отбора признаков (по SHAP, Permutation, Phik) |
-| `car_train_full.csv` | Полная версия тренировочного сета после объединения всех источников, до фильтрации признаков |
-| `car_train_merged.csv` | Сырые данные после объединения основных таблиц (`car_train`, `rides_info`, `driver_info`, `fix_info`) |
-| `links_with_models.csv` | Таблица со ссылками на страницы моделей машин, использовалась для парсинга данных с сайтов |
-| `mean_salary_by_city_sorted.csv` | Справочная таблица со средней зарплатой по городам, использовалась при обогащении датасета |
-| `submission.csv` | Финальный файл с предсказаниями классов поломки для отправки на Kaggle |
+| `parsed_car_dataset.csv` | Спарсенный датасет с новыми признаками (`box`, `year`, `price`, `power`) |
+| `car_test_final.csv` | Финальная тестовая выборка с минимально доступными признаками |
+| `submission_soft_optuna.csv` | Сабмишен с моделей, обученных на базовом наборе признаков |
+| `submission_soft_ext_optuna.csv` | Сабмишен с моделей, обученных на расширенном датасете |
+| `catboost_tuned.pkl`, `lgb_tuned.pkl`, `xgb_tuned.pkl`, `rf_tuned.pkl` | Сохранённые модели после тюнинга |
+| `best_weights.json` | Оптимизированные веса для Soft Voting |
 
+---
 
 **Автор:** Ника (Data Scientist)
 
 **Формат:** Google Colab / Kaggle Notebook
 
-**Цель:** Использование реальных ML-инструментов в соревновательном pipeline
+**Цель:** Практика полного ML-пайплайна: от генерации признаков до оптимизации ансамбля и сабмита на платформу Kaggle.
